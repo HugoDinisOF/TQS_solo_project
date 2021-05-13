@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.time.Instant;
+import java.util.Date;
 
 @Entity
 @Table(name = "Air_Quality")
@@ -18,7 +19,19 @@ public class AirQuality {
     private String city;
     private double lat;
     private double lon;
-    private Instant timestamp;
+    private final Instant timestamp;
+    private Date date;
+    private int miss=0;
+    private int hit=0;
+
+    public AirQuality(){
+        timestamp = Instant.now();
+        setMiss(1);
+    }
+
+    public void addHit(){
+        hit += 1;
+    }
 
     @Column(name = "pm2_5",nullable = false)
     public double getPm2_5() {
@@ -72,5 +85,64 @@ public class AirQuality {
     @Id
     public Integer getId() {
         return id;
+    }
+
+    @Column(name = "city",nullable = false)
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    @Column(name = "lat",nullable = false)
+    public double getLat() {
+        return lat;
+    }
+
+    public void setLat(double lat) {
+        this.lat = lat;
+    }
+
+    @Column(name = "lon",nullable = false)
+    public double getLon() {
+        return lon;
+    }
+
+    public void setLon(double lon) {
+        this.lon = lon;
+    }
+
+    @Column(name = "timestamp",nullable = false)
+    public Instant getTimestamp() {
+        return timestamp;
+    }
+
+    @Column(name = "date",nullable = false)
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    @Column(name = "miss",nullable = false)
+    public int getMiss() {
+        return miss;
+    }
+
+    public void setMiss(int miss) {
+        this.miss = miss;
+    }
+
+    @Column(name = "hit",nullable = false)
+    public int getHit() {
+        return hit;
+    }
+
+    public void setHit(int hit) {
+        this.hit = hit;
     }
 }
