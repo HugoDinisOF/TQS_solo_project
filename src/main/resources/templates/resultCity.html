@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:if="${aqlist}!=null">
+        <title th:text="${aqlist.get(0).city}"></title>
+    </th:block>
+    <th:block th:unless="${aqlist}!=null">
+        <title>Today</title>
+    </th:block>
+    <link rel="stylesheet" href="./style.css" />
+    <meta charset="UTF-8" />
+
+</head>
+<body>
+<div class="container issue_list">
+    <h2>Air Quality</h2>
+    <br />
+    <div>
+        <input id="cityInput" type="text">
+        <button id="button" onclick="submitCity()">Search</button>
+    </div>
+    <table>
+        <tr>
+            <th>City</th>
+            <th>Date</th>
+            <th>O3</th>
+            <th>NO2</th>
+            <th>PM 2.5</th>
+            <th>PM 10</th>
+            <th>SO2</th>
+        </tr>
+        <th:block th:if="${aqlist} != null">
+            <th:block th:each="aq : ${aqlist}">
+                <tr>
+                    <td th:text="${aq.city}"></td>
+                    <td th:text="${aq.date.getDate()}+'-'+${aq.date.getMonth()}+'-'+${aq.date.getYear()+1900}"></td>
+                    <td th:text="${aq.o3}"></td>
+                    <td th:text="${aq.no2}"></td>
+                    <td th:text="${aq.pm2_5}"></td>
+                    <td th:text="${aq.pm10}"></td>
+                    <td th:text="${aq.so2}"></td>
+                </tr>
+            </th:block>
+        </th:block>
+    </table>
+</div>
+<script type="text/javascript">
+    function submitCity(){
+        var city = document.getElementById("cityInput").value;
+        window.location = "?city=" + city;
+    }
+</script>
+</body>
+</html>

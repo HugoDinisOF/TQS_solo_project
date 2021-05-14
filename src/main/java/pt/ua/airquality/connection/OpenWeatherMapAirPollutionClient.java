@@ -55,7 +55,8 @@ public class OpenWeatherMapAirPollutionClient implements ISimpleAPIClient{
             aq.setSo2(so2);
             aq.setPm10(pm10);
             aq.setO3(o3);
-            aq.setDate(new Date());
+            Date d = new Date();
+            aq.setDate(new Date(d.getYear(),d.getMonth(),d.getDate()));
             aq.setPm2_5(pm2_5);
             aq.setNo2(no2);
             aq.setCity(city);
@@ -111,7 +112,7 @@ public class OpenWeatherMapAirPollutionClient implements ISimpleAPIClient{
             aq.setSo2(so2);
             aq.setPm10(pm10);
             aq.setO3(o3);
-            aq.setDate(new Date());
+            aq.setDate(new Date(today.getYear(),today.getMonth(),today.getDate()+1));
             aq.setPm2_5(pm2_5);
             aq.setNo2(no2);
             aq.setCity(city);
@@ -165,7 +166,7 @@ public class OpenWeatherMapAirPollutionClient implements ISimpleAPIClient{
                     aq.setSo2(so2);
                     aq.setPm10(pm10);
                     aq.setO3(o3);
-                    aq.setDate(new Date());
+                    aq.setDate(new Date(date.getYear(),date.getMonth(),date.getDate()));
                     aq.setPm2_5(pm2_5);
                     aq.setNo2(no2);
                     aq.setCity(city);
