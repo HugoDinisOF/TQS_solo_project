@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Service
 @Transactional
@@ -22,6 +24,8 @@ public class AirQualityManagerService {
     private AirQualityRepository repository;
 
     private ISimpleAPIClient ApiClient = new OpenWeatherMapAirPollutionClient();
+    private final Logger logger = Logger.getLogger(AirQualityRepository.class.getName());
+
 
     public AirQualityManagerService(AirQualityRepository repository) {
         this.repository = repository;
@@ -32,6 +36,7 @@ public class AirQualityManagerService {
         Date d = new Date();
         Optional<AirQuality> resultRepo = repository.findAQbyCityAndDate(city,new Date(d.getYear(),d.getMonth(),d.getDate()));
         if (resultRepo.isEmpty()){
+            logger.log(Level.INFO, "Getting Air Quality Today from API");
             AirQuality result = ApiClient.getToday(city);
             repository.save(result);
             return result;
@@ -39,11 +44,13 @@ public class AirQualityManagerService {
 
         AirQuality aq = resultRepo.get();
         if(Instant.now().getEpochSecond()-aq.getTimestamp().getEpochSecond()>15*60){
+            logger.log(Level.INFO, "Getting Air Quality Today from API");
             AirQuality result = ApiClient.getToday(city);
             aq.update(result);
             repository.save(aq);
             return aq;
         }
+        logger.log(Level.INFO, "Getting Air Quality Today from repo");
         aq.addHit();
         repository.save(aq);
         return aq;
@@ -52,8 +59,10 @@ public class AirQualityManagerService {
     public AirQuality getAirQualityDateForCity(String city, Date d){
         Date today = new Date();
         Optional<AirQuality> resultRepo = repository.findAQbyCityAndDate(city,d);
+
         if (resultRepo.isEmpty()){
             if (today.getTime() > d.getTime()){
+                logger.log(Level.INFO, "Getting Air Quality Date from API");
                 Date dend = new Date(d.getYear(),d.getMonth(),d.getDate()+1);
                 dend.setHours(23);
                 AirQuality result = ApiClient.getHistoric(city,d,dend).get(0);
@@ -61,6 +70,7 @@ public class AirQualityManagerService {
                 return result;
             }
             else{
+                logger.log(Level.INFO, "Getting Air Quality Forecast from API");
                 AirQuality result = ApiClient.getForecast(city);
                 repository.save(result);
                 return result;
@@ -69,6 +79,7 @@ public class AirQualityManagerService {
         AirQuality aq = resultRepo.get();
         if(Instant.now().getEpochSecond()-aq.getTimestamp().getEpochSecond()>15*60){
             if (today.getTime() > aq.getDate().getTime()){
+                logger.log(Level.INFO, "Getting Air Quality Date from API");
                 Date dend = new Date(aq.getDate().getYear(),aq.getDate().getMonth(),aq.getDate().getDate()+1);
                 dend.setHours(23);
                 AirQuality result = ApiClient.getHistoric(city,d,dend).get(0);
@@ -77,12 +88,14 @@ public class AirQualityManagerService {
                 return aq;
             }
             else{
+                logger.log(Level.INFO, "Getting Air Quality Forecast from API");
                 AirQuality result = ApiClient.getForecast(city);
                 aq.update(result);
                 repository.save(aq);
                 return aq;
             }
         }
+        logger.log(Level.INFO, "Getting Air Quality Date from repo");
         aq.addHit();
         repository.save(aq);
         return resultRepo.get();
@@ -92,6 +105,7 @@ public class AirQualityManagerService {
         long days = (end.getTime()- start.getTime())/(1000*60*60*24)+1;
         List<AirQuality> resultRepo = repository.findAQSbyCityAndDate(city,start,end);
         if (resultRepo.size()<days){
+            logger.log(Level.INFO, "Getting Air Quality Historic from API");
             List<AirQuality> result = ApiClient.getHistoric(city,start,end);
             for (AirQuality aq: result){
                 Optional<AirQuality> resultdb1= repository.findAQbyCityAndDate(city,aq.getDate());
@@ -110,6 +124,7 @@ public class AirQualityManagerService {
             aq.addHit();
             repository.save(aq);
         }
+        logger.log(Level.INFO, "Getting Air Quality Date from repo");
         return resultRepo;
     }
     public List<AirQualityCacheData> getCache() {

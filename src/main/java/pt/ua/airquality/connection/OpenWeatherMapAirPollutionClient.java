@@ -119,7 +119,7 @@ public class OpenWeatherMapAirPollutionClient implements ISimpleAPIClient{
             URL url = new URL(SUrl);
             URLConnection request = url.openConnection();
             request.connect();
-            
+
             JsonElement root = JsonParser.parseReader(new InputStreamReader((InputStream) request.getContent())); //Convert the input stream to a json element
             JsonObject rootobj = root.getAsJsonObject(); //May be an array, may be an object.
             JsonArray listjson = rootobj.get("list").getAsJsonArray();
