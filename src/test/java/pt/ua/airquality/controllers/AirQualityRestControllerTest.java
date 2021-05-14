@@ -10,6 +10,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import pt.ua.airquality.entities.AirQuality;
+import pt.ua.airquality.entities.AirQualityCacheData;
 import pt.ua.airquality.service.AirQualityManagerService;
 
 import java.util.Arrays;
@@ -127,4 +128,15 @@ class AirQualityRestControllerTest {
         verify(service, times(1)).getAirQualityForCityHistoric("Aveiro",new Date(2021-1900, 5-1,11),new Date(2021-1900, 5-1,13));
     }
 
+    @Test
+    public void getCache() throws Exception{
+        AirQualityCacheData aqdata = new AirQualityCacheData(aq1);
+        when( service.getCache()).thenReturn( Arrays.asList(aqdata));
+
+        mvc.perform(MockMvcRequestBuilders.get("/api/cache"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].city", is(aqdata.getCity())));
+
+        verify(service, times(1)).getCache();
+    }
 }

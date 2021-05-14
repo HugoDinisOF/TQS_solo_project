@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.ua.airquality.entities.AirQuality;
+import pt.ua.airquality.entities.AirQualityCacheData;
 import pt.ua.airquality.service.AirQualityManagerService;
 
 import java.util.Calendar;
@@ -35,6 +36,12 @@ public class AirQualityRestController {
         Date d2 = convertStringtoDate(dateend);
         return service.getAirQualityForCityHistoric(city, d1, d2);
     }
+    @GetMapping("/cache")
+    public List<AirQualityCacheData> getCache(){
+        return service.getCache();
+    }
+
+
     private Date convertStringtoDate(String date){
         int year=Integer.parseInt(date.split("-")[2]);
         int month=Integer.parseInt(date.split("-")[1]);

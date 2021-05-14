@@ -5,9 +5,11 @@ import org.springframework.stereotype.Service;
 import pt.ua.airquality.connection.ISimpleAPIClient;
 import pt.ua.airquality.connection.OpenWeatherMapAirPollutionClient;
 import pt.ua.airquality.entities.AirQuality;
+import pt.ua.airquality.entities.AirQualityCacheData;
 import pt.ua.airquality.repository.AirQualityRepository;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -79,8 +81,13 @@ public class AirQualityManagerService {
         }
         return resultRepo;
     }
-    public List<AirQuality> getCache(String city, Date start, Date end) {
-        return repository.findAll();
+    public List<AirQualityCacheData> getCache() {
+        List<AirQualityCacheData> result = new ArrayList<>();
+        for (AirQuality aq: repository.findAll()){
+            AirQualityCacheData aqdata = new AirQualityCacheData(aq.getCity(),aq.getDate(),aq.getMiss(),aq.getHit());
+            result.add(aqdata);
+        }
+        return result;
     }
 
 

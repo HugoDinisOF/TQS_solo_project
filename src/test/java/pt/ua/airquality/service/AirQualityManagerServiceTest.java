@@ -8,14 +8,19 @@ import org.mockito.Mockito;
 import org.mockito.internal.verification.VerificationModeFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import pt.ua.airquality.connection.ISimpleAPIClient;
 import pt.ua.airquality.entities.AirQuality;
+import pt.ua.airquality.entities.AirQualityCacheData;
 import pt.ua.airquality.repository.AirQualityRepository;
 
 import java.util.*;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class AirQualityManagerServiceTest {
 
@@ -157,5 +162,15 @@ class AirQualityManagerServiceTest {
         assertEquals(aq,Arrays.asList(aq2,aq3));
         verify(repository, VerificationModeFactory.times(1)).findAQSbyCityAndDate("Aveiro", dend1,dend2);
         verify(apiClient, VerificationModeFactory.times(1)).getHistoric("Aveiro",dend1,dend2);
+    }
+    @Test
+    void getCache(){
+        AirQualityCacheData aqdata = new AirQualityCacheData(aq1);
+        when( repository.findAll()).thenReturn( Arrays.asList(aq1));
+
+        List<AirQualityCacheData> result=managerService.getCache();
+        assertEquals(result,Arrays.asList(aqdata));
+
+        verify(repository, times(1)).findAll();
     }
 }
