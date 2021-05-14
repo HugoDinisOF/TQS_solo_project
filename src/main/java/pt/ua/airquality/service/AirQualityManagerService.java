@@ -79,6 +79,10 @@ public class AirQualityManagerService {
         }
         return resultRepo;
     }
+    public List<AirQuality> getCache(String city, Date start, Date end) {
+        return repository.findAll();
+    }
+
 
     public void setApiClient(ISimpleAPIClient apiClient){
         this.ApiClient = apiClient;

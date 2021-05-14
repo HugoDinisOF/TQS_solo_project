@@ -1,9 +1,6 @@
 package pt.ua.airquality.entities;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Objects;
@@ -20,7 +17,7 @@ public class AirQuality {
     private String city;
     private double lat;
     private double lon;
-    private final Instant timestamp;
+    private Instant timestamp;
     private Date date;
     private int miss=0;
     private int hit=0;
@@ -83,7 +80,7 @@ public class AirQuality {
         this.id = id;
     }
 
-    @Id
+    @Id @GeneratedValue(strategy=GenerationType.AUTO)
     public Integer getId() {
         return id;
     }
@@ -118,6 +115,10 @@ public class AirQuality {
     @Column(name = "timestamp",nullable = false)
     public Instant getTimestamp() {
         return timestamp;
+    }
+
+    public void setTimestamp(Instant instant){
+        timestamp=instant;
     }
 
     @Column(name = "date",nullable = false)
