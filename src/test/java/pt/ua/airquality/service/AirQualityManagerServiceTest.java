@@ -5,20 +5,17 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.internal.verification.VerificationModeFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import pt.ua.airquality.connection.ISimpleAPIClient;
 import pt.ua.airquality.entities.AirQuality;
 import pt.ua.airquality.repository.AirQualityRepository;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class AirQualityManagerServiceTest {
 
@@ -33,6 +30,7 @@ class AirQualityManagerServiceTest {
     AirQuality aq1;
     AirQuality aq2;
     AirQuality aq3;
+    AirQuality aq4;
 
     @BeforeEach
     public void setUp(){
@@ -70,6 +68,16 @@ class AirQualityManagerServiceTest {
         aq3.setPm2_5(10);
         aq3.setPm10(10);
         aq3.setSo2(10);
+        aq4 = new AirQuality();
+        aq4.setCity("Aveiro");
+        aq4.setDate(new Date(d.getYear(),d.getMonth(),d.getDate()+1));
+        aq4.setLat(120);
+        aq4.setLon(120);
+        aq4.setNo2(10);
+        aq4.setO3(10);
+        aq4.setPm2_5(10);
+        aq4.setPm10(10);
+        aq4.setSo2(10);
 
     }
 
@@ -78,14 +86,76 @@ class AirQualityManagerServiceTest {
     void getAirQualityTodayForCityExistingOnRepoTest() {
         when(repository.findAQbyCityAndDate("Aveiro", new Date(d.getYear(),d.getMonth(),d.getDate()))).thenReturn(Optional.ofNullable(aq1));
         AirQuality aq = managerService.getAirQualityTodayForCity("Aveiro");
-
+        assertEquals(aq,aq1);
+        verify(repository, VerificationModeFactory.times(1)).findAQbyCityAndDate("Aveiro", new Date(d.getYear(),d.getMonth(),d.getDate()));
+        verify(apiClient, VerificationModeFactory.times(0)).getToday("Aveiro");
+    }
+    @Test
+    void getAirQualityTodayForCityExistingOnAPITest() {
+        when(repository.findAQbyCityAndDate("Aveiro", new Date(d.getYear(),d.getMonth(),d.getDate()))).thenReturn(Optional.empty());
+        when(apiClient.getToday("Aveiro")).thenReturn(aq1);
+        AirQuality aq = managerService.getAirQualityTodayForCity("Aveiro");
+        assertEquals(aq,aq1);
+        verify(repository, VerificationModeFactory.times(1)).findAQbyCityAndDate("Aveiro", new Date(d.getYear(),d.getMonth(),d.getDate()));
+        verify(apiClient, VerificationModeFactory.times(1)).getToday("Aveiro");
     }
 
     @Test
-    void getAirQualityDateForCity() {
+    void getAirQualityDateForCityOnRepoTest() {
+        Date dend1 = new Date(d.getYear(),d.getMonth(),d.getDate()+1);
+        Date dend2 = new Date(d.getYear(),d.getMonth(),d.getDate()+2);
+        when(repository.findAQbyCityAndDate("Aveiro", dend1)).thenReturn(Optional.ofNullable(aq4));
+        AirQuality aq = managerService.getAirQualityDateForCity("Aveiro",dend1);
+        assertEquals(aq,aq4);
+        verify(repository, VerificationModeFactory.times(1)).findAQbyCityAndDate("Aveiro", dend1);
+        verify(apiClient, VerificationModeFactory.times(0)).getHistoric("Aveiro",dend1,dend2);
+        verify(apiClient, VerificationModeFactory.times(0)).getForecast("Aveiro");
+    }
+    @Test
+    void getAirQualityDateForCityOnAPIForecastTest() {
+        Date dend1 = new Date(d.getYear(),d.getMonth(),d.getDate()+1);
+        Date dend2 = new Date(d.getYear(),d.getMonth(),d.getDate()+2);
+        when(repository.findAQbyCityAndDate("Aveiro", dend1)).thenReturn(Optional.empty());
+        when(apiClient.getForecast("Aveiro")).thenReturn(aq4);
+        AirQuality aq = managerService.getAirQualityDateForCity("Aveiro",dend1);
+        assertEquals(aq,aq4);
+        verify(repository, VerificationModeFactory.times(1)).findAQbyCityAndDate("Aveiro", dend1);
+        verify(apiClient, VerificationModeFactory.times(0)).getHistoric("Aveiro",dend1,dend2);
+        verify(apiClient, VerificationModeFactory.times(1)).getForecast("Aveiro");
+    }
+    @Test
+    void getAirQualityDateForCityOnAPIHistoricTest() {
+        Date dend1  =new Date(2021-1900,4,11);
+        Date dend = new Date(dend1.getYear(),dend1.getMonth(),dend1.getDate()+1);
+        dend.setHours(23);
+        when(repository.findAQbyCityAndDate("Aveiro", dend1)).thenReturn(Optional.empty());
+        when(apiClient.getHistoric("Aveiro",dend1,dend)).thenReturn(Arrays.asList(aq3));
+        AirQuality aq = managerService.getAirQualityDateForCity("Aveiro",dend1);
+        assertEquals(aq,aq3);
+        verify(repository, VerificationModeFactory.times(1)).findAQbyCityAndDate("Aveiro", dend1);
+        verify(apiClient, VerificationModeFactory.times(1)).getHistoric("Aveiro",dend1,dend);
+        verify(apiClient, VerificationModeFactory.times(0)).getForecast("Aveiro");
     }
 
     @Test
-    void getAirQualityForCityHistoric() {
+    void getAirQualityForCityHistoricRepoTest() {
+        Date dend1  =new Date(2021-1900,4,11);
+        Date dend2 = new Date(dend1.getYear(),dend1.getMonth(),dend1.getDate()+1);
+        when(repository.findAQSbyCityAndDate("Aveiro",dend1,dend2)).thenReturn(Arrays.asList(aq2,aq3));
+        List<AirQuality> aq = managerService.getAirQualityForCityHistoric("Aveiro",dend1,dend2);
+        assertEquals(aq,Arrays.asList(aq2,aq3));
+        verify(repository, VerificationModeFactory.times(1)).findAQSbyCityAndDate("Aveiro", dend1,dend2);
+        verify(apiClient, VerificationModeFactory.times(0)).getHistoric("Aveiro",dend1,dend2);
+    }
+    @Test
+    void getAirQualityForCityHistoricAPITest() {
+        Date dend1  =new Date(2021-1900,4,11);
+        Date dend2 = new Date(dend1.getYear(),dend1.getMonth(),dend1.getDate()+1);
+        when(repository.findAQSbyCityAndDate("Aveiro",dend1,dend2)).thenReturn(new ArrayList<>());
+        when(apiClient.getHistoric("Aveiro",dend1,dend2)).thenReturn(Arrays.asList(aq2,aq3));
+        List<AirQuality> aq = managerService.getAirQualityForCityHistoric("Aveiro",dend1,dend2);
+        assertEquals(aq,Arrays.asList(aq2,aq3));
+        verify(repository, VerificationModeFactory.times(1)).findAQSbyCityAndDate("Aveiro", dend1,dend2);
+        verify(apiClient, VerificationModeFactory.times(1)).getHistoric("Aveiro",dend1,dend2);
     }
 }

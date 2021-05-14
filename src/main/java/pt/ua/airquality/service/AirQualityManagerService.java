@@ -34,15 +34,50 @@ public class AirQualityManagerService {
             repository.save(result);
             return result;
         }
-        return resultRepo.get();
+        AirQuality aq = resultRepo.get();
+        aq.addHit();
+        repository.save(aq);
+        return aq;
     }
 
     public AirQuality getAirQualityDateForCity(String city, Date d){
-        return null;
+        Date today = new Date();
+        Optional<AirQuality> resultRepo = repository.findAQbyCityAndDate(city,d);
+        if (resultRepo.isEmpty()){
+            if (today.getTime() > d.getTime()){
+                Date dend = new Date(d.getYear(),d.getMonth(),d.getDate()+1);
+                dend.setHours(23);
+                AirQuality result = ApiClient.getHistoric(city,d,dend).get(0);
+                repository.save(result);
+                return result;
+            }
+            else{
+                AirQuality result = ApiClient.getForecast(city);
+                repository.save(result);
+                return result;
+            }
+        }
+        AirQuality aq = resultRepo.get();
+        aq.addHit();
+        repository.save(aq);
+        return resultRepo.get();
     }
 
     public List<AirQuality> getAirQualityForCityHistoric(String city, Date start, Date end){
-        return null;
+        Date d = new Date();
+        List<AirQuality> resultRepo = repository.findAQSbyCityAndDate(city,start,end);
+        if (resultRepo.size()==0){
+            List<AirQuality> result = ApiClient.getHistoric(city,start,end);
+            for (AirQuality aq: result){
+                repository.save(aq);
+            }
+            return result;
+        }
+        for (AirQuality aq: resultRepo){
+            aq.addHit();
+            repository.save(aq);
+        }
+        return resultRepo;
     }
 
     public void setApiClient(ISimpleAPIClient apiClient){
