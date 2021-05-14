@@ -12,6 +12,8 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class OpenWeatherMapAirPollutionClient implements ISimpleAPIClient{
     private final static String BASEURL_TODAY ="http://api.openweathermap.org/data/2.5/air_pollution?lat=%f&lon=%f&appid=%s";
@@ -20,6 +22,7 @@ public class OpenWeatherMapAirPollutionClient implements ISimpleAPIClient{
     private final static String APIKEY="1c428b4c88b618053ff3e686f3b49ed6";
     private final static String COMPONENTS="components";
     private final static String PM2_5="pm2_5";
+    private final Logger logger = Logger.getLogger(OpenWeatherMapAirPollutionClient.class.getName());
 
     OpenWeatherMapGeocodingClient geocodingClient = new OpenWeatherMapGeocodingClient();
 
@@ -36,13 +39,12 @@ public class OpenWeatherMapAirPollutionClient implements ISimpleAPIClient{
         String SUrl = String.format(BASEURL_TODAY,lat,lon,APIKEY);
         try {
             URL url = new URL(SUrl);
+            logger.log(Level.INFO, "Communicating with url: "+SUrl);
             URLConnection request = url.openConnection();
             request.connect();
 
-            // Convert to a JSON object to print data
-            //from gson
-            JsonElement root = JsonParser.parseReader(new InputStreamReader((InputStream) request.getContent())); //Convert the input stream to a json element
-            JsonObject rootobj = root.getAsJsonObject(); //May be an array, may be an object.
+            JsonElement root = JsonParser.parseReader(new InputStreamReader((InputStream) request.getContent()));
+            JsonObject rootobj = root.getAsJsonObject();
             JsonArray aqlist = rootobj.get("list").getAsJsonArray();
             JsonObject components = aqlist.get(0).getAsJsonObject().get(COMPONENTS).getAsJsonObject();
             AirQuality aq = createAirQualityFromComponent(components);
@@ -70,18 +72,16 @@ public class OpenWeatherMapAirPollutionClient implements ISimpleAPIClient{
         String SUrl = String.format(BASEURL_FORECAST,lat,lon,APIKEY);
         try {
             URL url = new URL(SUrl);
+            logger.log(Level.INFO, "Communicating with url: "+SUrl);
             URLConnection request = url.openConnection();
             request.connect();
 
-            // Convert to a JSON object to print data
-            //from gson
-            JsonElement root = JsonParser.parseReader(new InputStreamReader((InputStream) request.getContent())); //Convert the input stream to a json element
-            JsonObject rootobj = root.getAsJsonObject(); //May be an array, may be an object.
+            JsonElement root = JsonParser.parseReader(new InputStreamReader((InputStream) request.getContent()));
+            JsonObject rootobj = root.getAsJsonObject();
             JsonArray aqlist = rootobj.get("list").getAsJsonArray();
             JsonObject components = null;
             Date today = new Date();
             long dateunix = (new Date(today.getYear(),today.getMonth(),today.getDate())).getTime()/1000;
-            System.out.println(dateunix);
             for (JsonElement c : aqlist) {
                 int dt = c.getAsJsonObject().get("dt").getAsInt();
                 if (dt-dateunix>60*60*24){
@@ -109,19 +109,17 @@ public class OpenWeatherMapAirPollutionClient implements ISimpleAPIClient{
         try {
             latlon = geocodingClient.getLatLonfromCity(city);
         }catch (IOException e){
-            return null;
+            return new ArrayList<>();
         }
         double lat = latlon[0];
         double lon = latlon[1];
         String SUrl = String.format(BASEURL_HISTORIC,lat,lon,dateStart.getTime()/1000,dateEnd.getTime()/1000,APIKEY);
-        System.out.println(SUrl);
+        logger.log(Level.INFO, "Communicating with url: "+SUrl);
         try {
             URL url = new URL(SUrl);
             URLConnection request = url.openConnection();
             request.connect();
-
-            // Convert to a JSON object to print data
-            //from gson
+            
             JsonElement root = JsonParser.parseReader(new InputStreamReader((InputStream) request.getContent())); //Convert the input stream to a json element
             JsonObject rootobj = root.getAsJsonObject(); //May be an array, may be an object.
             JsonArray listjson = rootobj.get("list").getAsJsonArray();
@@ -134,7 +132,6 @@ public class OpenWeatherMapAirPollutionClient implements ISimpleAPIClient{
                 Date date = new Date(dt*1000);
                 String converted = String.format("%d-%d-%d",date.getYear(),date.getMonth(),date.getDate());
                 if (datesAlreadyUsed.add(converted)){
-                    System.out.println("aqui");
                     components = c.getAsJsonObject().get(COMPONENTS).getAsJsonObject();
                     AirQuality aq = createAirQualityFromComponent(components);
                     aq.setDate(new Date(date.getYear(),date.getMonth(),date.getDate()));
@@ -146,7 +143,7 @@ public class OpenWeatherMapAirPollutionClient implements ISimpleAPIClient{
             }
             return aqlist;
         }catch (Exception e){
-            return null;
+            return new ArrayList<>();
         }
     }
 
