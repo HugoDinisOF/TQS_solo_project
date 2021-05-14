@@ -19,6 +19,7 @@ public class OpenWeatherMapAirPollutionClient implements ISimpleAPIClient{
     private final static String BASEURL_HISTORIC ="http://api.openweathermap.org/data/2.5/air_pollution/history?lat=%f&lon=%f&start=%d&end=%d&appid=%s";
     private final static String APIKEY="1c428b4c88b618053ff3e686f3b49ed6";
     private final static String COMPONENTS="components";
+    private final static String PM2_5="pm2_5";
 
     OpenWeatherMapGeocodingClient geocodingClient = new OpenWeatherMapGeocodingClient();
 
@@ -44,21 +45,11 @@ public class OpenWeatherMapAirPollutionClient implements ISimpleAPIClient{
             JsonObject rootobj = root.getAsJsonObject(); //May be an array, may be an object.
             JsonArray aqlist = rootobj.get("list").getAsJsonArray();
             JsonObject components = aqlist.get(0).getAsJsonObject().get(COMPONENTS).getAsJsonObject();
-            double no2 = components.get("no2").getAsDouble();
-            double o3 = components.get("o3").getAsDouble();
-            double so2 = components.get("so2").getAsDouble();
-            double pm2_5 = components.get("pm2_5").getAsDouble();
-            double pm10 = components.get("pm10").getAsDouble();
-            AirQuality aq = new AirQuality();
+            AirQuality aq = createAirQualityFromComponent(components);
             aq.setLat(lat);
             aq.setLon(lon);
-            aq.setSo2(so2);
-            aq.setPm10(pm10);
-            aq.setO3(o3);
             Date d = new Date();
             aq.setDate(new Date(d.getYear(),d.getMonth(),d.getDate()));
-            aq.setPm2_5(pm2_5);
-            aq.setNo2(no2);
             aq.setCity(city);
             return aq;
         }catch (Exception e){
@@ -101,20 +92,10 @@ public class OpenWeatherMapAirPollutionClient implements ISimpleAPIClient{
             if (components == null){
                 return null;
             }
-            double no2 = components.get("no2").getAsDouble();
-            double o3 = components.get("o3").getAsDouble();
-            double so2 = components.get("so2").getAsDouble();
-            double pm2_5 = components.get("pm2_5").getAsDouble();
-            double pm10 = components.get("pm10").getAsDouble();
-            AirQuality aq = new AirQuality();
+            AirQuality aq = createAirQualityFromComponent(components);
             aq.setLat(lat);
             aq.setLon(lon);
-            aq.setSo2(so2);
-            aq.setPm10(pm10);
-            aq.setO3(o3);
             aq.setDate(new Date(today.getYear(),today.getMonth(),today.getDate()+1));
-            aq.setPm2_5(pm2_5);
-            aq.setNo2(no2);
             aq.setCity(city);
             return aq;
         }catch (Exception e){
@@ -155,22 +136,12 @@ public class OpenWeatherMapAirPollutionClient implements ISimpleAPIClient{
                 if (datesAlreadyUsed.add(converted)){
                     System.out.println("aqui");
                     components = c.getAsJsonObject().get(COMPONENTS).getAsJsonObject();
-                    double no2 = components.get("no2").getAsDouble();
-                    double o3 = components.get("o3").getAsDouble();
-                    double so2 = components.get("so2").getAsDouble();
-                    double pm2_5 = components.get("pm2_5").getAsDouble();
-                    double pm10 = components.get("pm10").getAsDouble();
-                    AirQuality aq = new AirQuality();
+                    AirQuality aq = createAirQualityFromComponent(components);
+                    aq.setDate(new Date(date.getYear(),date.getMonth(),date.getDate()));
+                    aqlist.add(aq);
                     aq.setLat(lat);
                     aq.setLon(lon);
-                    aq.setSo2(so2);
-                    aq.setPm10(pm10);
-                    aq.setO3(o3);
-                    aq.setDate(new Date(date.getYear(),date.getMonth(),date.getDate()));
-                    aq.setPm2_5(pm2_5);
-                    aq.setNo2(no2);
                     aq.setCity(city);
-                    aqlist.add(aq);
                 }
             }
             return aqlist;
@@ -182,4 +153,19 @@ public class OpenWeatherMapAirPollutionClient implements ISimpleAPIClient{
     public void setGeocodingClient(OpenWeatherMapGeocodingClient geocodingClient){
         this.geocodingClient = geocodingClient;
     }
+    public AirQuality createAirQualityFromComponent(JsonObject components){
+        double no2 = components.get("no2").getAsDouble();
+        double o3 = components.get("o3").getAsDouble();
+        double so2 = components.get("so2").getAsDouble();
+        double pm2_5 = components.get(PM2_5).getAsDouble();
+        double pm10 = components.get("pm10").getAsDouble();
+        AirQuality aq = new AirQuality();
+        aq.setSo2(so2);
+        aq.setPm10(pm10);
+        aq.setO3(o3);
+        aq.setPm2_5(pm2_5);
+        aq.setNo2(no2);
+        return aq;
+    }
+
 }
