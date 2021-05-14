@@ -23,7 +23,7 @@ import java.util.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class TodayTest {
+public class WebdriverUI {
   private WebDriver driver;
   private Map<String, Object> vars;
   JavascriptExecutor js;
