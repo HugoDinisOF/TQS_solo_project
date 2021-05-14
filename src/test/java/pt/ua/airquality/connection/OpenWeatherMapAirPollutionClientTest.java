@@ -29,6 +29,9 @@ class OpenWeatherMapAirPollutionClientTest {
         when(geocodingClient.getLatLonfromCity("Aveiro")).thenReturn(new double[]{40.6443,-8.6455});
 
         AirQuality aq = client.getToday("Aveiro");
+        Date d=new Date();
+        assertEquals(new Date(d.getYear(),d.getMonth(),d.getDate()),aq.getDate());
+        assertEquals("Aveiro",aq.getCity());
 
     }
 
@@ -37,7 +40,10 @@ class OpenWeatherMapAirPollutionClientTest {
         when(geocodingClient.getLatLonfromCity("Aveiro")).thenReturn(new double[]{40.6443,-8.6455});
 
         AirQuality aq = client.getForecast("Aveiro");
-        System.out.println(aq);
+        Date d=new Date();
+        assertEquals(new Date(d.getYear(),d.getMonth(),d.getDate()+1),aq.getDate());
+        assertEquals("Aveiro",aq.getCity());
+
     }
     @Test
     void getHistoric() throws IOException {

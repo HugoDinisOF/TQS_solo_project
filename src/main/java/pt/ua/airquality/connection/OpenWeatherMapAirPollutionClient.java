@@ -15,10 +15,11 @@ import java.net.URLConnection;
 import java.util.*;
 
 public class OpenWeatherMapAirPollutionClient implements ISimpleAPIClient{
-    private final String baseurlToday="http://api.openweathermap.org/data/2.5/air_pollution?lat=%f&lon=%f&appid=%s";
-    private final String baseurlForecast="http://api.openweathermap.org/data/2.5/air_pollution/forecast?lat=%f&lon=%f&appid=%s";
-    private final String baseurlHistoric="http://api.openweathermap.org/data/2.5/air_pollution/history?lat=%f&lon=%f&start=%d&end=%d&appid=%s";
+    private final static String baseurlToday="http://api.openweathermap.org/data/2.5/air_pollution?lat=%f&lon=%f&appid=%s";
+    private final static String baseurlForecast="http://api.openweathermap.org/data/2.5/air_pollution/forecast?lat=%f&lon=%f&appid=%s";
+    private final static String baseurlHistoric="http://api.openweathermap.org/data/2.5/air_pollution/history?lat=%f&lon=%f&start=%d&end=%d&appid=%s";
     private final static String APIKEY="1c428b4c88b618053ff3e686f3b49ed6";
+    private final static String COMPONENTS="components";
 
     OpenWeatherMapGeocodingClient geocodingClient = new OpenWeatherMapGeocodingClient();
 
@@ -43,7 +44,7 @@ public class OpenWeatherMapAirPollutionClient implements ISimpleAPIClient{
             JsonElement root = JsonParser.parseReader(new InputStreamReader((InputStream) request.getContent())); //Convert the input stream to a json element
             JsonObject rootobj = root.getAsJsonObject(); //May be an array, may be an object.
             JsonArray aqlist = rootobj.get("list").getAsJsonArray();
-            JsonObject components = aqlist.get(0).getAsJsonObject().get("components").getAsJsonObject();
+            JsonObject components = aqlist.get(0).getAsJsonObject().get(COMPONENTS).getAsJsonObject();
             double no2 = components.get("no2").getAsDouble();
             double o3 = components.get("o3").getAsDouble();
             double so2 = components.get("so2").getAsDouble();
@@ -94,7 +95,7 @@ public class OpenWeatherMapAirPollutionClient implements ISimpleAPIClient{
             for (JsonElement c : aqlist) {
                 int dt = c.getAsJsonObject().get("dt").getAsInt();
                 if (dt-dateunix>60*60*24){
-                    components = c.getAsJsonObject().get("components").getAsJsonObject();
+                    components = c.getAsJsonObject().get(COMPONENTS).getAsJsonObject();
                     break;
                 }
             }
@@ -154,7 +155,7 @@ public class OpenWeatherMapAirPollutionClient implements ISimpleAPIClient{
                 String converted = String.format("%d-%d-%d",date.getYear(),date.getMonth(),date.getDate());
                 if (datesAlreadyUsed.add(converted)){
                     System.out.println("aqui");
-                    components = c.getAsJsonObject().get("components").getAsJsonObject();
+                    components = c.getAsJsonObject().get(COMPONENTS).getAsJsonObject();
                     double no2 = components.get("no2").getAsDouble();
                     double o3 = components.get("o3").getAsDouble();
                     double so2 = components.get("so2").getAsDouble();

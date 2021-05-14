@@ -16,6 +16,7 @@ import java.util.List;
 @Controller
 public class AirQualityController {
 
+    private static final String AQLIST = "aqlist"
     @Autowired
     private AirQualityManagerService service;
 
@@ -30,7 +31,7 @@ public class AirQualityController {
             List<AirQuality> lista = new ArrayList<>();
             AirQuality aq = service.getAirQualityTodayForCity(city);
             lista.add(aq);
-            model.addAttribute("aqlist",lista);
+            model.addAttribute(AQLIST,lista);
         }
         return "resultCity";
     }
@@ -41,7 +42,7 @@ public class AirQualityController {
             List<AirQuality> lista = new ArrayList<>();
             AirQuality aq = service.getAirQualityDateForCity(city,date);
             lista.add(aq);
-            model.addAttribute("aqlist",lista);
+            model.addAttribute(AQLIST,lista);
         }
         return "resultCityDate";
     }
@@ -55,7 +56,7 @@ public class AirQualityController {
             Date sdate = convertStringtoDate(startDate);
             Date edate = convertStringtoDate(endDate);
             List<AirQuality> result = service.getAirQualityForCityHistoric(city,sdate,edate);
-            model.addAttribute("aqlist",result);
+            model.addAttribute(AQLIST,result);
         }
         return "resultHistoricCityDate";
     }

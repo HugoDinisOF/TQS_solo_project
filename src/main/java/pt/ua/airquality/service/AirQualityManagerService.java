@@ -91,11 +91,19 @@ public class AirQualityManagerService {
 
     public List<AirQuality> getAirQualityForCityHistoric(String city, Date start, Date end){
         Date d = new Date();
+        long days = (end.getTime()- start.getTime())/(1000*60*60*24)+1;
         List<AirQuality> resultRepo = repository.findAQSbyCityAndDate(city,start,end);
-        if (resultRepo.size()==0){
+        if (resultRepo.size()<days){
             List<AirQuality> result = ApiClient.getHistoric(city,start,end);
             for (AirQuality aq: result){
-                repository.save(aq);
+                if (repository.findAQbyCityAndDate(city,aq.getDate()).isEmpty()){
+                    repository.save(aq);
+                }
+                else{
+                    AirQuality aqold =repository.findAQbyCityAndDate(city,aq.getDate()).get();
+                    aqold.update(aq);
+                    repository.save(aqold);
+                }
             }
             return result;
         }
