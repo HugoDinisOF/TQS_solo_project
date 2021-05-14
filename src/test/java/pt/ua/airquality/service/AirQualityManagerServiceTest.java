@@ -78,7 +78,7 @@ class AirQualityManagerServiceTest {
     @Test
     void getAirQualityTodayForCityExistingOnRepoTest() {
         when(repository.findAQbyCityAndDate("Aveiro", new Date(d.getYear(),d.getMonth(),d.getDate()))).thenReturn(Optional.ofNullable(aq1));
-        managerService.getAirQualityTodayForCity("Aveiro");
+        AirQuality aq = managerService.getAirQualityTodayForCity("Aveiro");
 
     }
 

@@ -6,6 +6,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.time.Instant;
 import java.util.Date;
+import java.util.Objects;
 
 @Entity
 @Table(name = "Air_Quality")
@@ -144,5 +145,18 @@ public class AirQuality {
 
     public void setHit(int hit) {
         this.hit = hit;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof AirQuality)) return false;
+        AirQuality that = (AirQuality) o;
+        return Double.compare(that.getPm2_5(), getPm2_5()) == 0 && Double.compare(that.getPm10(), getPm10()) == 0 && Double.compare(that.getNo2(), getNo2()) == 0 && Double.compare(that.getO3(), getO3()) == 0 && Double.compare(that.getSo2(), getSo2()) == 0 && Double.compare(that.getLat(), getLat()) == 0 && Double.compare(that.getLon(), getLon()) == 0 && getCity().equals(that.getCity()) && getDate().equals(that.getDate());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getPm2_5(), getPm10(), getNo2(), getO3(), getSo2(), getCity(), getLat(), getLon(), getDate());
     }
 }
