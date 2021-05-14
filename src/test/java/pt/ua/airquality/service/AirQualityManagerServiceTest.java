@@ -22,10 +22,8 @@ import static org.mockito.Mockito.when;
 
 class AirQualityManagerServiceTest {
 
-    @Mock(lenient = true)
     private AirQualityRepository repository;
 
-    @InjectMocks
     private AirQualityManagerService managerService;
 
     private ISimpleAPIClient apiClient;
@@ -38,9 +36,10 @@ class AirQualityManagerServiceTest {
 
     @BeforeEach
     public void setUp(){
+        repository = mock(AirQualityRepository.class);
         apiClient = mock(ISimpleAPIClient.class);
+        managerService = new AirQualityManagerService(repository);
         managerService.setApiClient(apiClient);
-
         aq1 = new AirQuality();
         aq1.setCity("Aveiro");
         aq1.setDate(new Date(d.getYear(),d.getMonth(),d.getDate()));
