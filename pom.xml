@@ -15,6 +15,9 @@
     <description>TQS Air Quality</description>
     <properties>
         <java.version>11</java.version>
+        <sonar.projectKey>HugoDinisOF_TQS_solo_project</sonar.projectKey>
+        <sonar.organization>hugodinisof</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
     <dependencies>
         <dependency>
