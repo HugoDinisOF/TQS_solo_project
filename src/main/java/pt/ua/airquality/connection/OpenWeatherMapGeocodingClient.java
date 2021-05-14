@@ -2,9 +2,7 @@ package pt.ua.airquality.connection;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.springframework.context.annotation.Bean;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,11 +12,11 @@ import java.net.URLConnection;
 
 public class OpenWeatherMapGeocodingClient {
 
-    private final String baseurl = "http://api.openweathermap.org/geo/1.0/direct?q=%s&appid=%s";
+    private final static String BASEURL = "http://api.openweathermap.org/geo/1.0/direct?q=%s&appid=%s";
     private final static String APIKEY="1c428b4c88b618053ff3e686f3b49ed6";
 
     public double[] getLatLonfromCity(String city) throws IOException {
-        String SUrl = String.format(baseurl,city,APIKEY);
+        String SUrl = String.format(BASEURL,city,APIKEY);
         // Connect to the URL using java's native library
         URL url = new URL(SUrl);
         URLConnection request = url.openConnection();

@@ -4,7 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.springframework.beans.factory.annotation.Autowired;
 import pt.ua.airquality.entities.AirQuality;
 
 import java.io.IOException;
@@ -15,9 +14,9 @@ import java.net.URLConnection;
 import java.util.*;
 
 public class OpenWeatherMapAirPollutionClient implements ISimpleAPIClient{
-    private final static String baseurlToday="http://api.openweathermap.org/data/2.5/air_pollution?lat=%f&lon=%f&appid=%s";
-    private final static String baseurlForecast="http://api.openweathermap.org/data/2.5/air_pollution/forecast?lat=%f&lon=%f&appid=%s";
-    private final static String baseurlHistoric="http://api.openweathermap.org/data/2.5/air_pollution/history?lat=%f&lon=%f&start=%d&end=%d&appid=%s";
+    private final static String BASEURL_TODAY ="http://api.openweathermap.org/data/2.5/air_pollution?lat=%f&lon=%f&appid=%s";
+    private final static String BASEURL_FORECAST ="http://api.openweathermap.org/data/2.5/air_pollution/forecast?lat=%f&lon=%f&appid=%s";
+    private final static String BASEURL_HISTORIC ="http://api.openweathermap.org/data/2.5/air_pollution/history?lat=%f&lon=%f&start=%d&end=%d&appid=%s";
     private final static String APIKEY="1c428b4c88b618053ff3e686f3b49ed6";
     private final static String COMPONENTS="components";
 
@@ -33,7 +32,7 @@ public class OpenWeatherMapAirPollutionClient implements ISimpleAPIClient{
         }
         double lat = latlon[0];
         double lon = latlon[1];
-        String SUrl = String.format(baseurlToday,lat,lon,APIKEY);
+        String SUrl = String.format(BASEURL_TODAY,lat,lon,APIKEY);
         try {
             URL url = new URL(SUrl);
             URLConnection request = url.openConnection();
@@ -77,7 +76,7 @@ public class OpenWeatherMapAirPollutionClient implements ISimpleAPIClient{
         }
         double lat = latlon[0];
         double lon = latlon[1];
-        String SUrl = String.format(baseurlForecast,lat,lon,APIKEY);
+        String SUrl = String.format(BASEURL_FORECAST,lat,lon,APIKEY);
         try {
             URL url = new URL(SUrl);
             URLConnection request = url.openConnection();
@@ -133,7 +132,7 @@ public class OpenWeatherMapAirPollutionClient implements ISimpleAPIClient{
         }
         double lat = latlon[0];
         double lon = latlon[1];
-        String SUrl = String.format(baseurlHistoric,lat,lon,dateStart.getTime()/1000,dateEnd.getTime()/1000,APIKEY);
+        String SUrl = String.format(BASEURL_HISTORIC,lat,lon,dateStart.getTime()/1000,dateEnd.getTime()/1000,APIKEY);
         System.out.println(SUrl);
         try {
             URL url = new URL(SUrl);
