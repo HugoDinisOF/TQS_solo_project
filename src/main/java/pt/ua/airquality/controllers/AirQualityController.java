@@ -16,7 +16,7 @@ import java.util.List;
 @Controller
 public class AirQualityController {
 
-    private static final String AQLIST = "aqlist"
+    private static final String AQLIST = "aqlist";
     @Autowired
     private AirQualityManagerService service;
 
