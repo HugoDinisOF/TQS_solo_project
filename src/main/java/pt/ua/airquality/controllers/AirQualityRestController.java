@@ -39,6 +39,6 @@ public class AirQualityRestController {
         int year=Integer.parseInt(date.split("-")[2]);
         int month=Integer.parseInt(date.split("-")[1]);
         int day=Integer.parseInt(date.split("-")[0]);
-        return new Date(year, month-1,day);
+        return new Date(year-1900, month-1,day);
     }
 }

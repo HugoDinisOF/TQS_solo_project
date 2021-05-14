@@ -94,7 +94,7 @@ class AirQualityRestControllerTest {
     }
     @Test
     public void getAQforCityDate() throws Exception{
-        when( service.getAirQualityDateForCity("Aveiro",new Date(2021, 5-1,13))).thenReturn( aq1 );
+        when( service.getAirQualityDateForCity("Aveiro",new Date(2021-1900, 5-1,13))).thenReturn( aq1 );
 
         mvc.perform(MockMvcRequestBuilders.get("/api/airquality/date/Aveiro/13-05-2021"))
                 .andExpect(status().isOk())
@@ -107,13 +107,13 @@ class AirQualityRestControllerTest {
                 .andExpect(jsonPath("so2").value(12))
                 .andExpect(jsonPath("city").value("Aveiro"));
 
-        verify(service, times(1)).getAirQualityDateForCity("Aveiro",new Date(2021, 5-1,13));
+        verify(service, times(1)).getAirQualityDateForCity("Aveiro",new Date(2021-1900, 5-1,13));
     }
     @Test
     public void getAirQualityForCityHistoric() throws Exception{
         List<AirQuality> aqlist = Arrays.asList(aq3,aq2,aq1);
 
-        when( service.getAirQualityForCityHistoric("Aveiro",new Date(2021, 5-1,11),new Date(2021, 5-1,13))).thenReturn( aqlist );
+        when( service.getAirQualityForCityHistoric("Aveiro",new Date(2021-1900, 5-1,11),new Date(2021-1900, 5-1,13))).thenReturn( aqlist );
 
         mvc.perform(MockMvcRequestBuilders.get("/api/airquality/historic/Aveiro/11-05-2021/13-05-2021"))
                 .andExpect(status().isOk())
@@ -124,7 +124,7 @@ class AirQualityRestControllerTest {
                 .andExpect(jsonPath("$[2].no2",is(aq1.getNo2())))
                 .andExpect(jsonPath("$[0].city",is(aq3.getCity())));
 
-        verify(service, times(1)).getAirQualityForCityHistoric("Aveiro",new Date(2021, 5-1,11),new Date(2021, 5-1,13));
+        verify(service, times(1)).getAirQualityForCityHistoric("Aveiro",new Date(2021-1900, 5-1,11),new Date(2021-1900, 5-1,13));
     }
 
 }
