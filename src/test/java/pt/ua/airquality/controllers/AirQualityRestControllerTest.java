@@ -40,7 +40,7 @@ class AirQualityRestControllerTest {
     void setUp() {
         aq1 = new AirQuality();
         aq1.setCity("Aveiro");
-        aq1.setDate(new Date(2021,4,13));
+        aq1.setDate(new Date(2021-1900,4,13));
         aq1.setLat(120);
         aq1.setLon(120);
         aq1.setNo2(12);
@@ -50,7 +50,7 @@ class AirQualityRestControllerTest {
         aq1.setSo2(12);
         aq2 = new AirQuality();
         aq2.setCity("Aveiro");
-        aq2.setDate(new Date(2021,4,12));
+        aq2.setDate(new Date(2021-1900,4,12));
         aq2.setLat(120);
         aq2.setLon(120);
         aq2.setNo2(11);
@@ -60,7 +60,7 @@ class AirQualityRestControllerTest {
         aq2.setSo2(11);
         aq3 = new AirQuality();
         aq3.setCity("Aveiro");
-        aq3.setDate(new Date(2021,4,11));
+        aq3.setDate(new Date(2021-1900,4,11));
         aq3.setLat(120);
         aq3.setLon(120);
         aq3.setNo2(10);
