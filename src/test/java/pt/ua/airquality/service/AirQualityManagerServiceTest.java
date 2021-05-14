@@ -14,6 +14,7 @@ import pt.ua.airquality.entities.AirQuality;
 import pt.ua.airquality.entities.AirQualityCacheData;
 import pt.ua.airquality.repository.AirQualityRepository;
 
+import java.time.Instant;
 import java.util.*;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -36,6 +37,7 @@ class AirQualityManagerServiceTest {
     AirQuality aq2;
     AirQuality aq3;
     AirQuality aq4;
+    AirQuality aq5;
 
     @BeforeEach
     public void setUp(){
@@ -83,6 +85,17 @@ class AirQualityManagerServiceTest {
         aq4.setPm2_5(10);
         aq4.setPm10(10);
         aq4.setSo2(10);
+        aq5 = new AirQuality();
+        aq5.setCity("Aveiro");
+        aq5.setDate(new Date(d.getYear(),d.getMonth(),d.getDate()));
+        aq5.setLat(120);
+        aq5.setLon(120);
+        aq5.setNo2(12);
+        aq5.setO3(12);
+        aq5.setPm2_5(12);
+        aq5.setPm10(12);
+        aq5.setSo2(12);
+        aq5.setTimestamp(Instant.ofEpochSecond(aq1.getTimestamp().getEpochSecond()-16L*60L));
 
     }
 
@@ -98,6 +111,15 @@ class AirQualityManagerServiceTest {
     @Test
     void getAirQualityTodayForCityExistingOnAPITest() {
         when(repository.findAQbyCityAndDate("Aveiro", new Date(d.getYear(),d.getMonth(),d.getDate()))).thenReturn(Optional.empty());
+        when(apiClient.getToday("Aveiro")).thenReturn(aq1);
+        AirQuality aq = managerService.getAirQualityTodayForCity("Aveiro");
+        assertEquals(aq,aq1);
+        verify(repository, VerificationModeFactory.times(1)).findAQbyCityAndDate("Aveiro", new Date(d.getYear(),d.getMonth(),d.getDate()));
+        verify(apiClient, VerificationModeFactory.times(1)).getToday("Aveiro");
+    }
+    @Test
+    void getAirQualityTodayForCityExistingOnRepoOldTest() {
+        when(repository.findAQbyCityAndDate("Aveiro", new Date(d.getYear(),d.getMonth(),d.getDate()))).thenReturn(Optional.ofNullable(aq5));
         when(apiClient.getToday("Aveiro")).thenReturn(aq1);
         AirQuality aq = managerService.getAirQualityTodayForCity("Aveiro");
         assertEquals(aq,aq1);
