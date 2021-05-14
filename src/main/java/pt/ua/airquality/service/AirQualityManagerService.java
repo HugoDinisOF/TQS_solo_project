@@ -28,7 +28,6 @@ public class AirQualityManagerService {
     }
 
 
-    //TODO add timestamp check
     public AirQuality getAirQualityTodayForCity(String city){
         Date d = new Date();
         Optional<AirQuality> resultRepo = repository.findAQbyCityAndDate(city,new Date(d.getYear(),d.getMonth(),d.getDate()));
@@ -90,17 +89,17 @@ public class AirQualityManagerService {
     }
 
     public List<AirQuality> getAirQualityForCityHistoric(String city, Date start, Date end){
-        Date d = new Date();
         long days = (end.getTime()- start.getTime())/(1000*60*60*24)+1;
         List<AirQuality> resultRepo = repository.findAQSbyCityAndDate(city,start,end);
         if (resultRepo.size()<days){
             List<AirQuality> result = ApiClient.getHistoric(city,start,end);
             for (AirQuality aq: result){
-                if (repository.findAQbyCityAndDate(city,aq.getDate()).isEmpty()){
+                Optional<AirQuality> resultdb1= repository.findAQbyCityAndDate(city,aq.getDate());
+                if (resultdb1.isEmpty()){
                     repository.save(aq);
                 }
                 else{
-                    AirQuality aqold =repository.findAQbyCityAndDate(city,aq.getDate()).get();
+                    AirQuality aqold =resultdb1.get();
                     aqold.update(aq);
                     repository.save(aqold);
                 }
