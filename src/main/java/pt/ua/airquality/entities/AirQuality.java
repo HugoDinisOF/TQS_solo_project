@@ -27,6 +27,15 @@ public class AirQuality {
         setMiss(1);
     }
 
+    public void update(AirQuality aq){
+        miss++;
+        pm2_5=aq.getPm2_5();
+        pm10=aq.getPm10();
+        no2=aq.getNo2();
+        o3=aq.getO3();
+        so2=aq.getSo2();
+    }
+
     public void addHit(){
         hit += 1;
     }

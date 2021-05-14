@@ -9,6 +9,7 @@ import pt.ua.airquality.entities.AirQualityCacheData;
 import pt.ua.airquality.repository.AirQualityRepository;
 
 import javax.transaction.Transactional;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -36,7 +37,14 @@ public class AirQualityManagerService {
             repository.save(result);
             return result;
         }
+
         AirQuality aq = resultRepo.get();
+        if(Instant.now().getEpochSecond()-aq.getTimestamp().getEpochSecond()>15*60){
+            AirQuality result = ApiClient.getToday(city);
+            aq.update(result);
+            repository.save(aq);
+            return aq;
+        }
         aq.addHit();
         repository.save(aq);
         return aq;
@@ -60,6 +68,22 @@ public class AirQualityManagerService {
             }
         }
         AirQuality aq = resultRepo.get();
+        if(Instant.now().getEpochSecond()-aq.getTimestamp().getEpochSecond()>15*60){
+            if (today.getTime() > aq.getDate().getTime()){
+                Date dend = new Date(aq.getDate().getYear(),aq.getDate().getMonth(),aq.getDate().getDate()+1);
+                dend.setHours(23);
+                AirQuality result = ApiClient.getHistoric(city,d,dend).get(0);
+                aq.update(result);
+                repository.save(aq);
+                return aq;
+            }
+            else{
+                AirQuality result = ApiClient.getForecast(city);
+                aq.update(result);
+                repository.save(aq);
+                return aq;
+            }
+        }
         aq.addHit();
         repository.save(aq);
         return resultRepo.get();
